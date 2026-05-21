@@ -55,7 +55,7 @@ export default function About(): React.ReactElement {
                         </div>
 
                         <a
-                            href="https://github.com/inowio-tech/d2d"
+                            href="https://github.com/inowio/D2d"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="mt-10 flex items-center justify-center gap-3 w-full py-4 rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-gray-900/10 dark:shadow-white/5"

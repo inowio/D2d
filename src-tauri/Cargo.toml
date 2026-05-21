@@ -1,7 +1,7 @@
 [package]
 name = "inowio-d2d"
 version = "0.1.0"
-description = "A Tauri App"
+description = "This cross platform project is a data conversion utility for industrial automation and engineers."
 authors = ["you"]
 edition = "2021"
 

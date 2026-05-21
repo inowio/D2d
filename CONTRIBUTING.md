@@ -74,6 +74,15 @@ cargo fmt        # Rust formatting (only if you touched src-tauri/)
 Please add or update tests alongside new features and bug fixes. See
 [TESTING.md](TESTING.md) for conventions.
 
+## Releasing
+
+Maintainers cut releases with `npm run release -- X.Y.Z`, which bumps every
+version field and dates the changelog, followed by committing and pushing the
+`vX.Y.Z` tag. Pushing the tag triggers the GitHub Actions workflow that
+builds the desktop installers and publishes a draft release. The full
+runbook — updater keypair setup, CI secrets, the release loop, pre-releases,
+and failure recovery — is in [docs/RELEASING.md](docs/RELEASING.md).
+
 ## Reporting Issues & Requests
 
 - **Bug reports** — include OS, app version, Node/Rust versions, reproduction

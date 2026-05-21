@@ -1,15 +1,53 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import type { Update } from "@tauri-apps/plugin-updater";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import UpdateDialog from "./components/UpdateDialog";
 import Home from "./pages/Home";
 import Converter from "./pages/Converter";
 import AllInOne from "./pages/AllInOne";
 import About from "./pages/About";
+import { checkForUpdate, installAndRelaunch } from "./utils/updater";
+import { isDesktop } from "./utils/platform";
 import "./App.css";
+
+interface UpdatePrompt {
+  version: string;
+  currentVersion: string;
+  notes: string | null;
+  update: Update;
+}
 
 function App(): React.ReactElement {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [updatePrompt, setUpdatePrompt] = useState<UpdatePrompt | null>(null);
+  const checkedOnceRef = useRef(false);
+
+  // Silent startup update check, desktop only and once per process. Mobile
+  // builds update through their app stores, and the updater plugin is not
+  // available in the browser dev server — failures are swallowed here; the
+  // manual "Check for updates" button on the About page surfaces errors.
+  useEffect(() => {
+    if (checkedOnceRef.current || !isDesktop()) return;
+    checkedOnceRef.current = true;
+
+    let cancelled = false;
+    void (async () => {
+      const result = await checkForUpdate();
+      if (cancelled || result.status !== "available") return;
+      setUpdatePrompt({
+        version: result.version,
+        currentVersion: result.currentVersion,
+        notes: result.notes,
+        update: result.update,
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const handleContextMenu = (event: MouseEvent): void => {
@@ -67,6 +105,16 @@ function App(): React.ReactElement {
           </main>
         </div>
       </div>
+      {updatePrompt && (
+        <UpdateDialog
+          open
+          version={updatePrompt.version}
+          currentVersion={updatePrompt.currentVersion}
+          notes={updatePrompt.notes}
+          install={(onProgress) => installAndRelaunch(updatePrompt.update, onProgress)}
+          onClose={() => setUpdatePrompt(null)}
+        />
+      )}
     </BrowserRouter>
   );
 }

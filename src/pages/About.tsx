@@ -1,6 +1,52 @@
-import { HiExternalLink, HiCode, HiLightningBolt } from "react-icons/hi";
+import { useState } from "react";
+import {
+    HiExternalLink,
+    HiCode,
+    HiLightningBolt,
+    HiRefresh,
+    HiCheck,
+    HiExclamationCircle,
+} from "react-icons/hi";
+import type { Update } from "@tauri-apps/plugin-updater";
+import UpdateDialog from "../components/UpdateDialog";
+import { checkForUpdate, installAndRelaunch } from "../utils/updater";
+import { isDesktop } from "../utils/platform";
+
+type CheckState =
+    | { kind: "idle" }
+    | { kind: "checking" }
+    | { kind: "up-to-date" }
+    | { kind: "error"; message: string };
+
+interface UpdatePrompt {
+    version: string;
+    currentVersion: string;
+    notes: string | null;
+    update: Update;
+}
 
 export default function About(): React.ReactElement {
+    const [checkState, setCheckState] = useState<CheckState>({ kind: "idle" });
+    const [updatePrompt, setUpdatePrompt] = useState<UpdatePrompt | null>(null);
+
+    const handleCheck = async (): Promise<void> => {
+        setCheckState({ kind: "checking" });
+        const result = await checkForUpdate();
+        if (result.status === "available") {
+            setUpdatePrompt({
+                version: result.version,
+                currentVersion: result.currentVersion,
+                notes: result.notes,
+                update: result.update,
+            });
+            setCheckState({ kind: "idle" });
+        } else if (result.status === "up-to-date") {
+            setCheckState({ kind: "up-to-date" });
+        } else {
+            setCheckState({ kind: "error", message: result.message });
+        }
+    };
+
     return (
         <div className="min-h-full bg-gray-50/50 dark:bg-gray-950/50 animate-in fade-in duration-700">
             {/* Hero Section */}
@@ -17,10 +63,40 @@ export default function About(): React.ReactElement {
                             </div>
                             <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-indigo-500 dark:from-blue-400 dark:to-indigo-300">D2d</span>
                         </h1>
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-bold mb-8 border border-blue-100 dark:border-blue-800/50 shadow-sm">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-bold mb-4 border border-blue-100 dark:border-blue-800/50 shadow-sm">
                             <HiLightningBolt className="w-4 h-4" />
-                            <span className="tracking-wide">VERSION 0.1.0 ALPHA</span>
+                            <span className="tracking-wide">VERSION {__APP_VERSION__}</span>
                         </div>
+
+                        {isDesktop() && (
+                            <div className="flex flex-col items-center gap-2 mb-8">
+                                <button
+                                    type="button"
+                                    onClick={handleCheck}
+                                    disabled={checkState.kind === "checking"}
+                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-300 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    <HiRefresh className={`w-4 h-4 ${checkState.kind === "checking" ? "animate-spin" : ""}`} />
+                                    Check for updates
+                                </button>
+                                {checkState.kind === "up-to-date" && (
+                                    <span className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+                                        <HiCheck className="w-4 h-4" />
+                                        You're on the latest version.
+                                    </span>
+                                )}
+                                {checkState.kind === "error" && (
+                                    <span
+                                        className="inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400"
+                                        title={checkState.message}
+                                    >
+                                        <HiExclamationCircle className="w-4 h-4" />
+                                        Couldn't check for updates.
+                                    </span>
+                                )}
+                            </div>
+                        )}
+
                         <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl leading-relaxed font-medium">
                             A professional-grade data conversion toolkit built for modern developer workflows.
                             Simplify complex data transformations with precision and speed.
@@ -114,6 +190,17 @@ export default function About(): React.ReactElement {
                     </div>
                 </div>
             </div>
+
+            {updatePrompt && (
+                <UpdateDialog
+                    open
+                    version={updatePrompt.version}
+                    currentVersion={updatePrompt.currentVersion}
+                    notes={updatePrompt.notes}
+                    install={(onProgress) => installAndRelaunch(updatePrompt.update, onProgress)}
+                    onClose={() => setUpdatePrompt(null)}
+                />
+            )}
         </div>
     );
 }

@@ -12,6 +12,10 @@
     IEEE 754 single/double precision.
   - Edge cases — empty input, whitespace handling, `0x` prefixes,
     arbitrary-precision values, and invalid-input error messages.
+- **Release tooling (Vitest)** —
+  [`scripts/bump-version.test.mjs`](scripts/bump-version.test.mjs) covers the
+  version-bump script: semver parsing/comparison, version-field rewrites, and
+  changelog reshaping.
 
 ## Commands
 

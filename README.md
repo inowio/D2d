@@ -29,6 +29,8 @@ lightweight, cross-platform experience.
   and IEEE 754 single/double precision
 - Dark/light theming and a mobile-responsive UI
 - Runs fully offline as a native app for Windows, macOS, Linux, and Android
+- Desktop builds auto-update from signed GitHub releases; mobile builds
+  update through their app stores
 
 ## Conversions
 
@@ -55,20 +57,33 @@ There are two ways to get D2d:
    one for your OS.
 2. **Build it from source** — see [Getting Started](#getting-started).
 
-| OS      | Installer            | Notes                                       |
-| ------- | -------------------- | ------------------------------------------- |
-| Windows | `*-setup.exe` (NSIS) | Recommended for personal/desktop installs.  |
-| Windows | `*.msi`              | For MDM / IT-managed deployments.           |
-| macOS   | `*.dmg`              | Open it, then drag D2d to Applications.     |
-| Linux   | `*.AppImage`         | Mark it executable, then run.               |
-| Linux   | `*.deb` / `*.rpm`    | For Debian/Ubuntu and Fedora/RHEL.          |
-| Android | `*.apk`              | Sideload on a device with unknown sources allowed. |
+| OS      | Installer            | Auto-update | Notes                                   |
+| ------- | -------------------- | ----------- | --------------------------------------- |
+| Windows | `*-setup.exe` (NSIS) | Yes         | Recommended for personal/desktop installs. |
+| Windows | `*.msi`              | No          | For MDM / IT-managed deployments.       |
+| macOS   | `*.dmg`              | Yes         | Open it, then drag D2d to Applications. |
+| Linux   | `*.AppImage`         | Yes         | Mark it executable, then run.           |
+| Linux   | `*.deb` / `*.rpm`    | No          | For Debian/Ubuntu and Fedora/RHEL.      |
+| Android | `*.apk`              | Via store   | Updates arrive through the app store.   |
 
 > **First-launch warning.** D2d binaries are currently unsigned at the OS
 > level, so the first time you run the app Windows SmartScreen will show
 > "Windows protected your PC" — click **More info → Run anyway**. macOS
 > Gatekeeper will say the app cannot be opened — right-click the app and
 > choose **Open**, then confirm. This is a one-time approval per machine.
+
+### How updates work
+
+Desktop builds (Windows, macOS, Linux) include an in-app auto-updater. On
+startup the app checks the latest GitHub release; if a newer version exists
+it prompts you to install. You can also trigger the check manually from the
+**About** page. Update artifacts are minisign-signed, so a tampered download
+is rejected. The `.msi`, `.deb`, and `.rpm` packages are excluded from
+auto-update by design — re-install those manually.
+
+Android and iOS builds do **not** self-update. Mobile updates are delivered
+by the Google Play Store and Apple App Store when a new version is published
+there.
 
 ## Getting Started
 
@@ -136,12 +151,15 @@ See [TESTING.md](TESTING.md) for coverage details and conventions.
 
 ```
 D2d/
+├── .github/          # GitHub Actions release workflow
 ├── src/              # React + TypeScript UI
-│   ├── components/   # Navbar, Sidebar
+│   ├── components/   # Navbar, Sidebar, UpdateDialog
 │   ├── contexts/     # Theme (dark/light) context
 │   ├── pages/        # Home, Converter, Multi-Format, About
-│   └── utils/        # Conversion engine, explanations, clipboard, tests
+│   └── utils/        # Conversion engine, explanations, clipboard, updater
 ├── src-tauri/        # Rust shell, Tauri config, icons, Android project
+├── scripts/          # Release version-bump script
+├── docs/             # Maintainer documentation (RELEASING.md)
 ├── public/           # Static assets (logos, fonts)
 └── dist/             # Production frontend build output
 ```
@@ -161,6 +179,8 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md)
 before opening an issue or pull request — it covers the workflow, coding
 standards, and how to add a new conversion. Conventional commits, tests, and
 linted code help us review quickly.
+
+Maintainers cutting a release: see [docs/RELEASING.md](docs/RELEASING.md).
 
 ## License
 

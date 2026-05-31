@@ -190,7 +190,7 @@ Released under the [MIT License](LICENSE).
 
 - Issues: <https://github.com/inowio/D2d/issues>
 - Discussions: <https://github.com/inowio/D2d/discussions>
-- Email: <support@inowio.in>
+- Email: <inowio@outlook.com>
 
 ---
 

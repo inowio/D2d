@@ -13,6 +13,14 @@ lightweight, cross-platform experience.
 
 ![Inowio D2d](public/logo.svg)
 
+## Screenshots
+
+| | |
+| --- | --- |
+| ![Inowio D2d screenshot 1](public/screenshots/D2d1.jpg) | ![Inowio D2d screenshot 2](public/screenshots/D2d2.jpg) |
+| ![Inowio D2d screenshot 3](public/screenshots/D2d3.jpg) | ![Inowio D2d screenshot 4](public/screenshots/D2d4.jpg) |
+| ![Inowio D2d screenshot 5](public/screenshots/D2d5.jpg) | |
+
 ## Highlights
 
 - **26 conversion tools** across 8 categories — Binary, Hexadecimal, Decimal,
@@ -190,7 +198,7 @@ Released under the [MIT License](LICENSE).
 
 - Issues: <https://github.com/inowio/D2d/issues>
 - Discussions: <https://github.com/inowio/D2d/discussions>
-- Email: <inowio@outlook.com>
+- Email: <info@inowio.in>
 
 ---
 
